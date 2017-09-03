@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>FM Enterprises</title>
+        <meta name="keywords" content="HTML5,CSS3,Admin Template" />
+        <meta name="description" content="" />
+        <meta name="Author" content="Psd2allconversion [www.psd2allconversion.com]" />
+
+        <!-- mobile settings -->
+        <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0" />
+        <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+
+        <!-- WEB FONTS : use %7C instead of | (pipe) -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400%7CRaleway:300,400,500,600,700%7CLato:300,400,400italic,600,700" rel="stylesheet" type="text/css" />
+
+        <!-- CORE CSS -->
+        <link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/metis-menu/metisMenu.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/simple-line-icons-master/css/simple-line-icons.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/animate/animate.css" rel="stylesheet" type="text/css" />
+        <link href="assets/plugins/c3/c3.min.css" rel="stylesheet">
+        <link href="assets/plugins/widget/widget.css" rel="stylesheet">
+        <link href="assets/plugins/calendar/fullcalendar.min.css" rel="stylesheet">
+        <link href="assets/plugins/ui/jquery-ui.css" rel="stylesheet">
+
+        <!-- THEME CSS -->
+        <link href="assets/css/style.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/theme/dark.css" rel="stylesheet" type="text/css" />
+
+        <!-- PAGE LEVEL SCRIPTS -->
+        <script type="text/javascript" src="assets/plugins/jquery/js/jquery-3.1.1.min.js"></script>
+		
+		<script src="assets/custom/executiveslist.js"></script>
+		<script src="assets/custom/fileUploadScript.js" ></script>
+		
+		<link rel="stylesheet" type="text/css" href="assets/custom/jquery-confirm.css"/>
+    	<script type="text/javascript" src="assets/custom/jquery-confirm.js"></script> 
+		
+		
+		
+	  
+		<script type="text/javascript">
+			
+		$(document).ready(function(){
+			$.post('checkSession',function(res){
+			 
+			   if(res=="fail"){
+				   location='index.html';
+			   }
+			   else{
+		//		  $("#details").modal({ backdrop : "static" });
+				  
+			 	  $('#basic').dataTable({
+						
+						"order": [[ 3, "asc" ]],
+						"processing" : true,
+						"ajax" : {
+							"url" : "allClients",
+							"type" : "GET",
+							"dataSrc": function (json) {
+							      var return_data = new Array();
+							      for(var i=0;i< json.length; i++){
+
+							    	if(json[i].days<=0){
+							        	return_data.push({
+							        	'id': json[i].id,
+							        	'name': json[i].name,
+							        	'mobile': json[i].mobile,
+							        	'status': '<button class="btn btn-danger" id="assign">Assign</button>',
+				 						'action'  : '<button class="btn" style="background-color:purple;color:white;" id="attach">Attach</button> <button class="btn btn-info" id="view">View</button> <button class="btn btn-warning" id="notify">Notify</button> <button class="btn btn-success" id="history">History</button>'
+							        	})
+							       	}
+							    	/* else if(json[i].days==15 ){
+							        	return_data.push({
+								        	'id': json[i].id,
+								        	'name': json[i].name,
+								        	'mobile': json[i].mobile,
+								        	'status': '<span class="label label-success">Assigned</span>',
+					 						'action'  : '<button class="btn" style="background-color:purple;color:white;" id="attach">Attach</button> <button class="btn btn-info" id="view">View</button> <button class="btn btn-warning" id="notify">Notify</button> <button class="btn btn-success" id="history">History</button>'
+								        	})
+								    } */
+							    	else if(json[i].days<=15 && json[i].status==1 ){
+							        	return_data.push({
+								        	'id': json[i].id,
+								        	'name': json[i].name,
+								        	'mobile': json[i].mobile,
+								        	'status': '<span class="label label-success">Assigned</span> <span class="label label-warning">Not Notified</span>',
+					 						'action'  : '<button class="btn" style="background-color:purple;color:white;" id="attach">Attach</button> <button class="btn btn-info" id="view">View</button> <button class="btn btn-warning" id="notify">Notify</button> <button class="btn btn-success" id="history">History</button>'
+								        	})
+								    } 
+						         	else{
+						         		return_data.push({
+						         			'id': json[i].id,
+								        	'name': json[i].name,
+								        	'mobile': json[i].mobile,
+					 						'status'  : '<span class="label label-warning">' + json[i].days +' days remain</span>',
+					 						'action'  : '<button class="btn" style="background-color:purple;color:white;" id="attach">Attach</button> <button class="btn btn-info" id="view">View</button> <button class="btn btn-warning" id="notify">Notify</button> <button class="btn btn-success" id="history">History</button>'
+							        	})
+						         		
+						        	}	  
+							        
+							      }
+							      return return_data;
+							    }
+						    },
+					    "columns": [
+          		            { "data": "id" },   
+          		            { "data": "name" },
+          		            { "data": "mobile" },
+          		            { "data": "status" },
+          		            { "data": "action" },
+          		            
+          		         ]  
+
+					});
+
+			 	 $('#basic tbody').on( 'click', '#view', function () {
+					    
+			         var data = [];
+			         
+			         $(this).closest('tr').find('td').each(function() {
+			             var textval = $(this).text(); 
+			             data.push(textval);
+			         });
+			        
+			         $("#viewdetails").modal({ backdrop : "static" });
+			         
+			         $.post('getClientDetails?clientid='+ data[0],function(d) {
+							
+						$.each(d,function(i,v) {
+							 
+							$('#id').val(v.id);
+							$('#id1').html(': '+v.id);
+							$('#cname').html(': '+v.name);
+							$('#father').html(': '+v.fathername);
+							$('#dob').html(': '+v.dob);
+							$('#mob').html(': '+v.mobile);
+							$('#mob2').html(': '+v.mobile2);
+							$('#adhar').html(': '+v.aadhar);
+							$('#mail').html(': '+v.email);
+							$('#addr').html(': '+v.address);
+							$('#laddr').html(': '+v.landaddr);
+							$('#slink').val(v.sharedlink);
+							$('#mobno').val(v.mobile);
+					//		$('#image1').html("<img width='100'  height='100' src='img3servlet?id="+v.id+"'></img>");//html('<img src="img3servlet?id='+v.id+'" />')
+								
+						});
+					 });
+			         
+			         $('#updateslink').click(function(){
+			        	var link=$('#slink').val();
+			        	$.post('updateSharedLink?clientid='+ data[0]+'&link='+link,function(res){
+			        		if(res=="success"){
+			        			$('#result').html('<span style="color:green">Link updated successfully<span>');
+			        		}
+			        		else{
+			        			$('#result').html('<span style="color:red">Unsuccessful.,Try again..<span>');
+			        		}
+			        	});
+			        	 
+			         });
+			         $('#updatemob').click(function(){
+				        	var mob=$('#mobno').val();
+				        	$.post('updateMobile?clientid='+ data[0]+'&mobile='+mob,function(res){
+				        		if(res=="success"){
+				        			$('#result1').html('<span style="color:green">Mobile Number updated successfully<span>');
+				        		}
+				        		else{
+				        			$('#result1').html('<span style="color:red">Unsuccessful.,Try again..<span>');
+				        		}
+				        	});
+				        	 
+				    });
+				    $('#getDocuments').click(function(){
+				    	$.post('getDocuments');
+				    });
+			         
+			 	 });
+			 	  
+			 	
+			 	$('#basic tbody').on( 'click', '#assign', function () {
+				    
+			         var data = [];
+			         
+			         $(this).closest('tr').find('td').each(function() {
+			             var textval = $(this).text(); 
+			             data.push(textval);
+			         });
+			         
+			         $("#list").modal({ backdrop : "static" });
+			         
+			         $('#assignto').click(function(){
+			        	var exe= $('#elist').val();
+			        	if(!exe){
+			        		$.alert('Please select Someone!');
+			        	} 
+			        	else{
+				        	$.confirm({
+				        	    title: 'Assigning!',
+				        	    content: 'Do you want to Assing this Executive?',
+				        	    type: 'red',
+				        	    typeAnimated: true,
+				        	    buttons: {
+				        	        Yes: {
+				        	            btnClass: 'btn-red',
+				        	            action: function(){
+				        	             	$.post('assignExecutive',{clientid: data[0],eid:exe},function(data){
+				    			        	//	$.alert(data);
+				    			        		$.alert({title:'Alert!',content: '<strong>'+data+'</strong>', type: 'green',buttons: { OK: function(){ location.reload();}} });
+				    			        	}); 
+				        	            }
+				        	        },
+				        	        No: function () {
+				        	        	location.reload();
+				        	        }
+				        	    }
+				        	});
+			        	}
+			        	 
+			         });
+			         
+			 	 });
+			 	 
+			 	
+			 	$('#basic tbody').on( 'click', '#attach', function () {
+				    
+			         var data = [];
+			         
+			         $(this).closest('tr').find('td').each(function() {
+			             var textval = $(this).text(); 
+			             data.push(textval);
+			         });
+			         $("#progressbar").width('0%');
+						$("#message").empty();
+						$("#percent").html("0%");
+						$('#photo').val('');
+						$('#type').val('aadhar');
+					 
+			         
+			         $("#attchfiles").modal({ backdrop : "static" });
+			         $('#clientid').val(data[0]);
+			         $('#uploaddoc').attr("disabled", true);
+			         var photo= $('#photo').val();
+			         $('#photo').on('change', function() {
+			         if(!photo){
+			        	 $('#uploaddoc').attr("disabled", false);
+			         }
+			         });
+			          
+			         
+			 	 });
+			 	
+			 	
+			 	  
+			 	 $('#basic tbody').on( 'click', '#notify', function () {
+					    
+			         var data = [];
+			         
+			         $(this).closest('tr').find('td').each(function() {
+			             var textval = $(this).text(); 
+			             data.push(textval);
+			         });
+			         
+			         $.confirm({
+			        	    title: 'Notifying!',
+			        	    content: 'Do you want to send Notification?',
+			        	    type: 'orange',
+			        	    typeAnimated: true,
+			        	    buttons: {
+			        	        Yes: {
+			        	            btnClass: 'btn-red',
+			        	            action: function(){
+			        	            	$.post('notifyClient?clientid='+data[0],function(dat){
+			    			        	//	$.alert(data);
+			    			        		$.alert({title:'Alert!',content: dat, type: 'purple',buttons: { OK: function(){ location.reload();}} });
+			    			        	}); 
+			        	            }
+			        	        },
+			        	        No: function () {
+			        	        	location.reload();
+			        	        }
+			        	    }
+			        	});
+			         
+			          
+			 	 });
+			 	 
+			 	$('#basic tbody').on( 'click', '#history', function () {
+				    
+			         var data = [];
+			         
+			         $(this).closest('tr').find('td').each(function() {
+			             var textval = $(this).text(); 
+			             data.push(textval);
+			         });
+			         
+			         $("#assignhistory").modal({ backdrop : "static" });
+			         $('#hist tbody').empty();
+			           
+			           $.post('getAssignedHistory?clientid='+data[0], function (data) {
+		                     $.each(data, function (i, value) {
+		      
+			                     var row = $("<tr bgcolor=\"lightblue\"></tr>").appendTo("#hist");
+			                     $("<td></td>").text(value.executiveid).appendTo(row);
+			                     $("<td></td>").text(value.executive).appendTo(row);
+			                     $("<td></td>").text(value.date).appendTo(row);
+		                
+		                      });
+		               });
+			           
+			           $('#excelhist').click(function(){
+			        	  
+				           $("#hist").table2excel({
+								exclude: ".noExl",
+								name: "Excel Document Name",
+								filename: data[1]+" AssignHistory",
+								fileext: ".xls",
+								exclude_img: true,
+								exclude_links: true,
+								exclude_inputs: true
+							}); 
+			           });
+			         
+			 	 }); 
+			 	
+			 	 
+			 	$('#type').on('change', function() {
+			 	//	$('#photo').val('');
+			 		$("#progressbar").width('0%');
+					$("#message").empty();
+					$("#percent").html("0%");
+					$('#photo').val('');
+					$('#uploaddoc').attr("disabled", true);
+			 		
+			 	});
+			 	
+			 	$('#passoptions').click(function(){
+			 		$("#passopt").modal({ backdrop : "static" });
+			 		$('#pass').hide();
+			 		
+			 		$('#getp').click(function(){
+			 	//		$.alert();
+			 			$.post('getPass',function(data){$('#pass').show(); $('#pass').val(data);});
+			 		});
+			 		$('#updatepass').click(function(){
+			 			var p= $('#newpass').val();
+			 			if(!p){
+			 				$.alert('Please Enter New Password');
+			 			}
+			 			else{
+			 				$.post('updatePassword?password='+p,function(data){ 
+			 					$.alert({title:'Alert!',content: '<strong>'+data+'</strong>', type: 'red',buttons: { OK: function(){ location.reload();}} });
+			 				});
+			 			}
+			 		});
+			 		
+			 	});
+			 	
+			 	$('#close').click(function(){
+					$('#newpass').val('');
+				})
+				
+			  }
+			   
+			});
+				
+		});
+		
+	</script>		
+		 
+    </head>
+    <body class="fixed-top">
+
+        <!-- wrapper -->
+        <div id="wrapper">
+            <!-- BEGIN HEADER -->
+            <div class="page-header navbar navbar-fixed-top">
+                <!-- BEGIN HEADER INNER -->
+                <div class="page-header-inner ">
+                    <!-- BEGIN LOGO -->
+                    <div class="page-logo">
+                        <a href="dashboard.html">
+                            <img src="assets/images/logo.png" alt="absolute admin" class="img-responsive logo-default"/> </a>
+
+                    </div>
+                    <div class="menu-toggler sidebar-toggler">
+                        <a href="javascript:;" class="navbar-minimalize minimalize-styl-2  pull-left "><i class="fa fa-bars"></i></a>
+                    </div>
+
+                     
+                    <!-- END LOGO -->
+
+                    <!-- BEGIN TOP NAVIGATION MENU -->
+                    <div class="top-menu">
+                        <ul class="nav navbar-nav pull-right">
+
+                            <!-- BEGIN USER LOGIN DROPDOWN -->
+                            <li class="dropdown dropdown-user" style="margin-right: 20px;">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" aria-expanded="false">
+                                   <!--  <img alt="" class="img-circle" src="assets/images/avtar-1.jpg"> -->
+									<i class="fa fa-user"></i>
+                                      
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-default">
+                                    <li>
+                                        <a href="javascript:;" id="passoptions"> <i class="icon-user"></i> My Profile </a>
+                                    </li>
+                                     
+                                    <li>
+                                        <a href="Logout"> <i class="icon-key"></i> Log Out </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <!-- END USER LOGIN DROPDOWN -->
+                            <!-- BEGIN QUICK SIDEBAR TOGGLER -->
+                            <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                            
+                            <!-- END QUICK SIDEBAR TOGGLER -->
+                        </ul>
+                    </div>
+                    <!-- END TOP NAVIGATION MENU -->
+                </div>
+                <!-- END HEADER INNER -->
+            </div>
+            <!-- END HEADER -->
+            <!-- BEGIN HEADER & CONTENT DIVIDER -->
+            <div class="clearfix"> </div>
+            <!-- END HEADER & CONTENT DIVIDER -->
+
+            <!-- BEGIN CONTAINER -->
+            <div class="page-container">
+
+                <aside class="sidebar">
+                    <nav class="sidebar-nav">
+                        <ul class="metismenu" id="menu">
+                        	<li class="active">
+                                <a style="color: white;" href="dashboard.html"><i class="icon-grid"></i> <span class="nav-label">Dash board</span></a>
+                            </li>
+                            <li >
+                                <a href="client.html"><i class="icon-grid"></i> <span class="nav-label">Add Client</span></a>
+                            </li>
+                            <li >
+                                <a href="executive.html"><i class="icon-grid"></i> <span class="nav-label">Add Executive</span></a>
+                            </li>
+                             
+ 
+                        </ul>
+                        <!-- END SIDEBAR MENU -->
+                        <!-- END SIDEBAR MENU -->
+                    </nav>
+                    <!-- END SIDEBAR -->
+                </aside>
+
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content-wrapper">
+                    <div class="content-wrapper container">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="page-title">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <h4 class="pull-left">Dashboard</h4>
+
+                                            <ol class="breadcrumb pull-right">
+                                                <li><a href="javascript: void(0);"><i class="fa fa-home"></i></a></li>
+                                                <li>Dashboard</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- end .page title-->
+
+                          <!-- <div class="row">
+                            
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card cyan white-text clearfix">
+
+                                    <div class="card-content clearfix">
+                                        <i class="icon-settings background-icon"></i>
+                                        <p class="card-stats-title right panel-title wdt-lable">Revenue</p>
+                                        <h4 class="right panel-middle margin-b-0 wdt-lable">$4762</h4>
+
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card orange white-text clearfix">
+
+                                    <div class="card-content clearfix">
+                                        <i class="icon-user background-icon"></i>
+                                        <p class="card-stats-title right panel-title wdt-lable">New User</p>
+                                        <h4 class="right panel-middle margin-b-0 wdt-lable">6,782</h4>
+
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card teal white-text clearfix">
+
+                                    <div class="card-content clearfix">
+                                        <i class="icon-basket background-icon"></i>
+                                        <p class="card-stats-title right panel-title wdt-lable">New Order</p>
+                                        <h4 class="right panel-middle margin-b-0 wdt-lable">1,782</h4>
+
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card green white-text clearfix">
+
+                                    <div class="card-content clearfix">
+                                        <i class="icon-graph background-icon"></i>
+                                        <p class="card-stats-title right panel-title wdt-lable">New Stats</p>
+                                        <h4 class="right panel-middle margin-b-0 wdt-lable">1,782</h4>
+
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div> -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+
+
+                                <div class="panel panel-card recent-activites">
+                                    <!-- Start .panel -->
+                                    <div class="panel-heading text-center"><strong style="color: white;">All Clients</strong> </div>
+                                    <div class="panel-body text-center">
+                                        <div class="table-responsive">
+                                            <table id="basic" class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center">
+                                                            <strong>Id</strong>
+                                                        </th>
+                                                        <th class="text-center">
+                                                            <strong>Name</strong>
+                                                        </th>
+                                                        <th class="text-center">
+                                                            <strong>Mobile</strong>
+                                                        </th>
+                                                         
+                                                        <th class="text-center">
+                                                            <strong>Status</strong>
+                                                        </th>
+                                                        <th class="text-center">
+                                                            <strong>Action</strong>
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+		                                   <div class="col-lg-offset-2 col-lg-2">
+				                                <form action="clientsExcel" method="post">
+						                        	<button type="submit" class="btn btn-default">Clients To Excel</button>	
+						                        </form>
+					                       </div> 
+					                       <div class="col-lg-offset-2 col-lg-2">
+				                                <form action="executivesExcel" method="post">
+						                        	<button type="submit" class="btn btn-default">Executives To Excel</button>	
+						                        </form>
+					                       </div> 
+		                        	</div>
+                                    
+                                </div><!-- End .panel --> 
+                                
+                            </div>
+                            
+                        </div>
+                        
+
+                    </div> 
+                    
+                    <div class="clearfix"></div>
+                    
+                    <div class="footer">
+                        <div class="pull-right">
+                            <strong>Copyright © 2017</strong>
+                        </div>
+                    </div>
+                </div>
+                <!-- END CONTENT BODY -->
+            </div>
+            <!-- END CONTAINER -->
+        </div>
+        <!-- /wrapper -->
+
+
+        <!-- SCROLL TO TOP -->
+        <a href="#" id="toTop"></a>
+
+
+        <!-- PRELOADER -->
+        <div id="preloader">
+            <div class="inner">
+                <span class="loader"></span>
+            </div>
+        </div><!-- /PRELOADER -->
+
+
+<!-- Modal -->
+	<div class="modal" id="addClient">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+
+				<div class="panel-body">
+					<button type="button" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					<h4 style="color: #d80204; margin-left: 30px; text-align: center; font-size: 20px"> <b> Add Client</b> </h4>
+					<hr />
+					<form class="form-horizontal group-border stripped" action="addClient" method="post">
+					 	<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Full Name</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text" name="name" id="name" required="required" class="form-control" placeholder="Enter Name" />   
+                             </div>
+						</div> 
+						
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Father's Name</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text" name="fname" id="fname" required="required" class="form-control" placeholder="Enter Name" />   
+                             </div>
+						</div> 
+						
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Mobile</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text"  name="mobile" id="mobile" required="required" class="form-control" placeholder="Enter Mobile no" />   
+                             </div>
+						</div> 
+						
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Alternative Mobile </label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text"  name="mobile2" id="mobile2" required="required" class="form-control" placeholder="Enter Mobile no" />   
+                             </div>
+						</div> 
+						
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Email</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="email"  name="email" id="email" required="required" class="form-control" placeholder="Enter Email" />   
+                             </div>
+						</div>  
+						
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Address</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="400" type="text"  name="address" id="address" required="required" class="form-control"  />   
+                             </div>
+						</div>  
+						
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Aadhar</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="number"  name="aadhar" id="aadhar" required="required" class="form-control" placeholder="Enter Aadhar no" />   
+                             </div>
+						</div>  
+						
+							
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Service Area Name</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text"  name="servicearea" id="servicearea" required="required" class="form-control" placeholder="Enter Aadhar no" />   
+                             </div>
+						</div>  
+							
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Survey Number</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text"  name="surveyno" id="surveyno" required="required" class="form-control" placeholder="Enter Aadhar no" />   
+                             </div>
+						</div>  
+							
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Land Address</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text"  name="landaddr" id="landaddr" required="required" class="form-control" placeholder="Enter Aadhar no" />   
+                             </div>
+						</div>  
+							
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">other</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+					         	<textarea rows="1" cols="78" name="other" id="other"></textarea>
+                              
+                             </div>
+						</div>  
+						 
+						<div class="form-group">
+
+						    <div class="col-md-offset-5 col-md-1 col-sm-offset-5 col-sm-2 col-xs-6 col-xs-2">
+								<input type="submit" value="Add" class="btn btn-info">
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+<!-- Modal -->
+	<div class="modal" id="addExecutive">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+
+				<div class="panel-body">
+					<button type="button" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					<h4 style="color: #d80204; margin-left: 30px; text-align: center; font-size: 20px"> <b> Add Executive</b> </h4>
+					<hr />
+					<form class="form-horizontal group-border stripped" action="addExecutive" method="post">
+					 	<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Full Name</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text" name="name" id="name" required="required" class="form-control" placeholder="Enter Name" />   
+                             </div>
+						</div> 
+						<br>
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Father's Name</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text" name="fname" id="fname" required="required" class="form-control" placeholder="Enter Name" />   
+                             </div>
+						</div> 
+						<br>
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Mobile</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="text"  name="mobile" id="mobile" required="required" class="form-control" placeholder="Enter Mobile no" />   
+                             </div>
+						</div> 
+						 
+						<br>
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Email</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="email"  name="email" id="email" required="required" class="form-control" placeholder="Enter Email" />   
+                             </div>
+						</div>  
+						<br>
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Address</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="400" type="text"  name="address" id="address" required="required" class="form-control"  />   
+                             </div>
+						</div>  
+						<br>
+						<div class="form-group">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Aadhar</label>
+					         <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                             	<input maxlength="200" type="number"  name="aadhar" id="aadhar" required="required" class="form-control" placeholder="Enter Aadhar no" />   
+                             </div>
+						</div>  
+						<br>
+
+						<div class="form-group">
+
+						    <div class="col-md-offset-5 col-md-1 col-sm-offset-5 col-sm-2 col-xs-6 col-xs-2">
+								<input type="submit" value="Add" class="btn btn-info">
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+<!-- Modal -->
+	<div class="modal" id="list" style="margin-top: 250px;">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="panel panel-card">
+				<div class="panel-body">
+					<div style="text-align: center;">
+						 <span style="color: red; font-size: 17px;">Executives List</span>
+						<button type="button" id="close" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+						
+					 </div> <hr>
+					<!-- <button type="button" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					 -->
+					<!-- <form class="form-horizontal group-border stripped" action="assign" method="post"> -->
+
+						<div class="form-group" style="margin-right: -150px">
+
+					 		 <label class="col-lg-3 col-md-4 col-xs-12 col-sm-3 control-label">Assign TO</label>
+					         <div class="col-lg-4 col-md-3 col-sm-3 col-xs-6">
+								<select class=" form-control" name="elist" id="elist" style="text-align: center;" required="required">
+									 <option value="" selected="selected" disabled="disabled">Select</option>
+
+								</select> 
+                             </div>
+						</div>  
+						<br>
+						<br>
+
+						<div class="form-group">
+
+						    <div class="col-md-offset-5 col-md-1 col-sm-offset-5 col-sm-2 col-xs-6 col-xs-2">
+								<button type="button" id="assignto"  class="btn btn-info">Assign</button>
+							</div>
+						</div>
+
+				<!-- 	</form> -->
+
+				</div>
+			</div>	
+			</div>
+		</div>
+
+	</div>
+
+<!-- Modal for Attach Files -->
+<div class="modal" id="attchfiles" style="margin-top: 150px;">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			
+		<div class="modal-body">
+			<div class="panel panel-card">
+				<div class="panel-body">
+				<div style="text-align: center;">
+					 <span style="color: red; font-size: 17px;">Attach Files</span>
+					<button type="button" id="closeA" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					
+				</div> <hr>
+				<!-- 	<button type="button" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					 -->
+						<form id="UploadForm" action="uploadFiles" method="post" enctype="multipart/form-data">
+							<br>
+						    <input type="hidden" id="clientid" name="clientid">
+							<div class="form-group" style="margin-right: -150px">
+								 <div class="col-lg-offset-1 col-lg-2 col-md-3 col-sm-3 col-xs-6">
+									<select id="type" name="type" required="required">
+										<!-- <option selected="selected" disabled="disabled">select</option> -->
+										<option value="aadhar">Aadhar</option>
+										<option value="pancard">Pan card</option>
+										<option value="ec">EC</option>
+										<option value="gpa">GPA</option>
+										<option value="others">Something</option>
+										<option value="other">Other</option>
+									</select>
+								 </div>
+								 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+									<input type="file" size="60" id="photo" name="photo">
+								 </div>
+							</div>
+							 <br>
+							<div class="form-group">
+
+							    <div class="col-md-offset-4 col-md-1 col-sm-offset-5 col-sm-2 col-xs-6 col-xs-2">
+									<button type="submit" class="btn btn-success" id="uploaddoc">Upload</button>
+								</div>
+							</div> 		
+							 <br>
+							 <br>
+							 <div class="form-group">
+							 <div class="col-lg-offset-1 col-lg-7">
+								<div id="progressbox">
+									<div id="progressbar"></div>
+									<div id="percent">0%</div>
+								</div>
+								<br />
+								<div id="message"></div>
+							</div>
+							</div>
+					 </form>
+
+				</div>
+			</div>
+		</div>
+	  </div>
+	</div>
+</div>
+
+<!-- Modal for Client Details -->
+
+	<div class="modal fade" id="viewdetails" role="dialog" style="margin-top: 20px">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header" style="text-align: center;">
+					<span style="color: red;font-size:20px;">Details</span>
+					<button type="button" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					
+				</div>
+
+				<div class="modal-body">
+
+					<div class="panel panel-card">
+
+						<div class="panel-body">
+
+							<div class="row">
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6   control-label">Id</label>
+									<div class="col-md-4 ">
+										<span id="id1"> </span>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6  control-label">Name</label>
+									<div class="col-md-4">
+										<span id="cname"> </span>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<label class=" col-md-2 col-xs-6 col-sm-6  control-label">Father's Name</label>
+									<div class="col-md-4">
+										<span id="father"> </span>
+									</div>
+								</div>                 
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6  control-label">Date Of Birth</label>
+									<div class="col-md-4">
+										<span id="dob"> </span>
+									</div>
+								</div>  
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6  control-label">Mobile</label>
+									<div class="col-md-4 ">
+										<span id="mob"> </span>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6  control-label">Alternative</label>
+									<div class="col-md-4">
+										<span id="mob2"> </span>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6  control-label">Aadhar</label>
+									<div class="col-md-4 ">
+										<span id="adhar"> </span>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6  control-label">Email</label>
+									<div class="col-md-4">
+										<span id="mail"> </span>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<label class=" col-md-2 col-xs-6 col-sm-6  control-label">Address</label>
+									<div class="col-md-4 ">
+										<span id="addr"> </span>
+									</div>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group">
+									<label class=" col-md-2 col-xs-6 col-sm-6  control-label">Land Address</label>
+									<div class="col-md-4 ">
+										<span id="laddr"> </span>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					 
+					<div class="panel panel-card">
+
+						<div class="panel-body">
+
+							<div class="row ">
+
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6   control-label" style="color: red; margin-left: 20px; font-size: 15px">Shared link</label>
+									<div class="col-md-3 ">
+										<input type="text" id="slink" name="slink">
+									</div>
+							 
+									<div class="row col-md-offset-6">
+										<button class="btn btn-success" style="margin-right: 20px" id="updateslink">Update</button>
+									</div>
+									<div id="result">
+										  
+									</div>
+								</div>
+							
+							</div>
+							<hr>
+							<div class="row ">
+
+								<div class="form-group">
+									<label class="col-md-2 col-xs-6 col-sm-6   control-label" style="color: red; margin-left: 20px; font-size: 15px">Mobile</label>
+									<div class="col-md-3 ">
+										<input type="text" id="mobno" name="mobno">
+									</div>
+							 
+									<div class="row col-md-offset-6">
+										<button class="btn btn-success" style="margin-right: 20px" id="updatemob">Change</button>
+									</div>
+									<div id="result1">
+										  
+									</div>
+								</div>
+							
+							</div>
+							
+							 
+						</div>
+					</div>	 
+					<div class="row col-lg-offset-5">
+							<form action="getDocuments" method="post">
+							<input type="hidden" id="id" name="id">
+							<input type="submit" class="btn btn-warning" value="Get Documents">
+							</form>
+							
+							</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!-- modal for AssignHistory  -->
+
+<div class="modal" id="assignhistory" style="margin-top: 150px;">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+
+				<div class="panel-body">
+					<button type="button" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+					<br>
+					<br>
+					<div class="table-responsive"  style="height: 200px; overflow: auto;">
+						<table id="hist" class="table table-bordered">
+							<thead>
+								<tr  bgcolor="lightgreen">
+									<th>Id</th>
+									<th>Executive</th>
+									<th>Date</th>
+								</tr>
+							</thead>
+							<tbody>
+			
+							</tbody>
+						</table>
+						
+					</div>
+					<hr>
+					<div>
+						<a href="javascript:;" id="excelhist">Export To Excel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+<!-- Modal for password options -->
+<div class="modal" id="passopt" style="margin-top: 150px;">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+
+				<div class="modal-body">
+					<div class="panel panel-card">
+						<div class="panel-body">
+							<div style="text-align: center;">
+								<span style="color: red; font-size: 17px; font-weight: 500;">Password Options</span>
+								<button type="button" id="close" class="close" data-dismiss="modal"> <b style="color: black">X</b> </button>
+
+							</div>
+							<hr>
+
+							<br>
+
+							<div class="form-group">
+								<div class="col-lg-offset-2 col-lg-2">
+									<a href="javascript:;" type="button"> <span class="label label-danger" id="getp">Old Password</span> </a>
+								</div>
+								<div class="col-lg-2 col-md-2 ">
+									<input type="text" name="pass" id="pass" readonly="readonly">
+								</div>
+							</div>
+							<br>
+							<hr>
+
+							<div class="row">
+								<div class="form-group">
+									<label class="col-md-3 col-xs-2 col-sm-2 control-label"
+										style="color: red;">New Password</label>
+									<div class="col-md-3 ">
+										<input type="text" id="newpass" name="newpass">
+									</div>
+
+									<div class="row col-md-offset-8">
+										<button class="btn btn-success" style="margin-right: 20px" id="updatepass">Change</button>
+									</div>
+
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> 
+
+        <!-- JAVASCRIPT FILES -->
+
+        <script type="text/javascript" src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+        <!-- PAGE LEVEL FILES -->
+        <script src="assets/plugins/data-tables/jquery.dataTables.js"></script>
+        <script src="assets/plugins/data-tables/dataTables.tableTools.js"></script>
+        <script src="assets/plugins/data-tables/dataTables.bootstrap.js"></script>
+        <script src="assets/plugins/data-tables/dataTables.responsive.js"></script>
+        <script src="assets/plugins/data-tables/tables-data.js"></script>
+        <!-- Custom FILES -->
+        <script type="text/javascript" src="assets/js/custom.js"></script>
+	<!-- 	<script src="http://malsup.github.com/jquery.form.js" ></script> -->
+		
+		<script src="assets/custom/jquery.form2.js" ></script>  
+		<script src="assets/custom/jquery.table2excel.js" ></script>
+
+    </body>
+</html>
